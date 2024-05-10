@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const Thing = require("./models/thing");
 
 // Connect to the MongoDB database using Mongoose
 mongoose
@@ -30,34 +31,30 @@ app.use((req, res, next) => {
 });
 
 app.post("/api/stuff", (req, res, next) => {
-  console.log(req.body); // We can access the body of the request thanks to the body-parser middleware
-  res.status(201).json({
-    message: "Object created!",
+  delete req.body._id; // Delete the _id field from the request body
+  const thing = new Thing({
+    ...req.body, // Copy all the fields from the request body (cf : opérateur spread)
   });
+  thing
+    .save()
+    .then(() =>
+      res.status(201).json({ message: "Object registered to the database." })
+    )
+    .catch((error) => res.status(400).json({ error }));
 });
 
 // Route to handle GET requests to the /api/stuff endpoint
 app.get("/api/stuff", (req, res, next) => {
-  const stuff = [
-    {
-      _id: "oeihfzeoi",
-      title: "Mon premier objet",
-      description: "Les infos de mon premier objet",
-      imageUrl:
-        "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
-      price: 4900,
-      userId: "qsomihvqios",
-    },
-    {
-      _id: "oeihfzeomoihi",
-      title: "Mon deuxième objet",
-      description: "Les infos de mon deuxième objet",
-      imageUrl:
-        "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
-      price: 2900,
-      userId: "qsomihvqios",
-    },
-  ];
-  res.status(200).json(stuff);
+  Thing.find() // Use the Mongoose model to fetch all the things from the database
+    .then((things) => res.status(200).json(things))
+    .catch((error) => res.status(400).json({ error }));
 });
+
+// Route to handle GET requests to the /api/stuff/:id endpoint
+app.get("/api/stuff/:id", (req, res, next) => {
+  Thing.findOne({ _id: req.params.id }) // Use the Mongoose model to find a specific thing in the database
+    .then((thing) => res.status(200).json(thing))
+    .catch((error) => res.status(404).json({ error }));
+});
+
 module.exports = app; // Export the Express app object for use in other modules
