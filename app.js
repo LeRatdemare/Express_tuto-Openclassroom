@@ -1,4 +1,14 @@
 const express = require("express");
+const mongoose = require("mongoose");
+
+// Connect to the MongoDB database using Mongoose
+mongoose
+  .connect(
+    "mongodb+srv://lufuluabon:I70gsjv7gSX4RyAk@mycluster.x9ytge6.mongodb.net/?retryWrites=true&w=majority&appName=MyCluster",
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then(() => console.log("Connexion à MongoDB réussie !"))
+  .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 const app = express();
 
