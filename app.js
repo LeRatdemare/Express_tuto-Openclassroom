@@ -57,4 +57,21 @@ app.get("/api/stuff/:id", (req, res, next) => {
     .catch((error) => res.status(404).json({ error }));
 });
 
+// Route to handle PUT requests to the /api/stuff/:id endpoint
+app.put("/api/stuff/:id", (req, res, next) => {
+  Thing.updateOne(
+    { _id: req.params.id }, // Find the object with the specified ID
+    { ...req.body, _id: req.params.id } // New version of the object
+  )
+    .then(() => res.status(200).json({ message: "Object updated." }))
+    .catch((error) => res.status(400).json({ error }));
+});
+
+// Route to handle DELETE requests to the /api/stuff/:id endpoint
+app.delete("/api/stuff/:id", (req, res, next) => {
+  Thing.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: "Object deleted." }))
+    .catch((error) => res.status(400).json({ error }));
+});
+
 module.exports = app; // Export the Express app object for use in other modules
